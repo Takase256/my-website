@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ja">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>ボタンクイズ</title>
+		<link rel="stylesheet" href="style.css" />
+	</head>
+	<body>
+		<div class="container">
+			<!-- 設定（歯車）ボタン -->
+			<button id="settingsButton" class="settings-button" aria-label="設定" title="設定">
+				<!-- simple gear SVG -->
+				<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+					<path d="M12 15.5A3.5 3.5 0 1 0 12 8.5a3.5 3.5 0 0 0 0 7z" fill="#000"/>
+					<path d="M19.4 15a7.9 7.9 0 0 0 .1-1 7.9 7.9 0 0 0-.1-1l2.1-1.6a.5.5 0 0 0 .1-.7l-2-3.4a.5.5 0 0 0-.6-.2l-2.5 1a7.7 7.7 0 0 0-1.7-1l-.4-2.7A.5.5 0 0 0 12 2h-4a.5.5 0 0 0-.5.4l-.4 2.7a7.7 7.7 0 0 0-1.7 1l-2.5-1a.5.5 0 0 0-.6.2l-2 3.4a.5.5 0 0 0 .1.7L4.5 13a7.9 7.9 0 0 0 0 2l-2.1 1.6a.5.5 0 0 0-.1.7l2 3.4c.1.2.4.3.6.2l2.5-1c.5.4 1.1.7 1.7 1l.4 2.7c.05.3.3.4.5.4h4c.3 0 .5-.2.5-.4l.4-2.7c.6-.2 1.2-.6 1.7-1l2.5 1c.2.1.5 0 .6-.2l2-3.4a.5.5 0 0 0-.1-.7L19.4 15z" fill="#000" opacity="0.6"/>
+				</svg>
+			</button>
+			<div id="quizScreen" class="quiz-screen">
+				<div class="header">
+					<h1>ボタンクイズ</h1>
+					<h2>以下のボタンのうち、正しい答えを選んでください。</h2>
+					<h3 id="questionText" aria-live="polite"></h3>
+					<div class="hint-section">
+						<button id="hintButton" class="hint-button">ヒント</button>
+						<p id="hintText" class="hint-text" aria-live="polite"></p>
+					</div>
+				</div>
+				<div class="main">
+					<ul class="button-list">
+						<li>
+							<button
+								id="selection1"
+								class="selection-button"
+								role="button"
+								aria-pressed="false"
+							></button>
+							<button
+								id="selection2"
+								class="selection-button"
+								role="button"
+								aria-pressed="false"
+							></button>
+						</li>
+						<li>
+							<button
+								id="selection3"
+								class="selection-button"
+								role="button"
+								aria-pressed="false"
+							></button>
+							<button
+								id="selection4"
+								class="selection-button"
+								role="button"
+								aria-pressed="false"
+							></button>
+						</li>
+					</ul>
+				</div>
+				<div class="footer">
+					<p id="resultText" class="result-text" aria-live="assertive"></p>
+					<button id="nextButton" class="next-button" disabled>次の問題</button>
+				</div>
+			</div>
+			<div id="resultScreen" class="result-screen" style="display: none">
+				<div class="header"><h1>クイズ結果</h1></div>
+				<div class="main">
+					<div id="scoreDisplay" class="score-display"></div>
+					<table id="resultTable" class="result-table">
+						<thead>
+							<tr>
+								<th>問題</th>
+								<th>正答</th>
+								<th>ヒント</th>
+								<th>解答</th>
+								<th>正誤</th>
+							</tr>
+						</thead>
+						<tbody id="resultTableBody"></tbody>
+					</table>
+					<button id="restartButton" class="restart-button">
+						もう一度挑戦する
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<!-- 設定パネル（最初は非表示） -->
+		<div id="settingsPanel" class="settings-panel" role="dialog" aria-hidden="true" aria-label="クイズ設定">
+			<div class="settings-dialog">
+				<h3>クイズ設定</h3>
+				<label for="settingsInput">問題数 (5〜50)</label>
+				<input id="settingsInput" type="number" min="5" max="50" value="5" />
+				<div class="settings-actions">
+					<button id="settingsSave" class="settings-save">保存</button>
+					<button id="settingsCancel" class="settings-cancel">キャンセル</button>
+				</div>
+				<p class="settings-note">設定を保存するとクイズがリセットされます。</p>
+			</div>
+		</div>
+
+		<script type="module">
+			import { createQuiz } from "./quiz-module.js";
+			// debug モードを有効にして初期化
+			const quiz = createQuiz({ debug: true });
+			quiz.init({
+				questionText: document.getElementById("questionText"),
+				hintButton: document.getElementById("hintButton"),
+				hintText: document.getElementById("hintText"),
+				selectionButtons: [
+					document.getElementById("selection1"),
+					document.getElementById("selection2"),
+					document.getElementById("selection3"),
+					document.getElementById("selection4"),
+				],
+				resultText: document.getElementById("resultText"),
+				nextButton: document.getElementById("nextButton"),
+				quizScreen: document.getElementById("quizScreen"),
+				resultScreen: document.getElementById("resultScreen"),
+				scoreDisplay: document.getElementById("scoreDisplay"),
+				resultTableBody: document.getElementById("resultTableBody"),
+				restartButton: document.getElementById("restartButton"),
+			});
+
+			// Settings UI wiring: 問題数を 5-50 の範囲で変更し、保存で再試行
+			const settingsButton = document.getElementById("settingsButton");
+			const settingsPanel = document.getElementById("settingsPanel");
+			const settingsInput = document.getElementById("settingsInput");
+			const settingsSave = document.getElementById("settingsSave");
+			const settingsCancel = document.getElementById("settingsCancel");
+
+			// 初期値を反映（quiz の既定の問題数がある場合）
+			if (quiz && typeof quiz.setConfig === "function") {
+				// Try to read current config by temporarily setting then reading back is not possible;
+				// We'll set the input default to 5 which is module default, user can change it.
+			}
+
+			function openSettings() {
+				if (!settingsPanel) return;
+				settingsPanel.style.display = "flex";
+				settingsPanel.setAttribute("aria-hidden", "false");
+				settingsInput.focus();
+			}
+
+			function closeSettings() {
+				if (!settingsPanel) return;
+				settingsPanel.style.display = "none";
+				settingsPanel.setAttribute("aria-hidden", "true");
+				settingsButton.focus();
+			}
+
+			settingsButton.addEventListener("click", openSettings);
+			settingsCancel.addEventListener("click", closeSettings);
+
+			settingsSave.addEventListener("click", () => {
+				const v = parseInt(settingsInput.value, 10);
+				if (Number.isNaN(v) || v < 5 || v > 50) {
+					alert("問題数は 5〜50 の範囲で入力してください。");
+					settingsInput.focus();
+					return;
+				}
+				if (quiz && typeof quiz.setConfig === "function") {
+					quiz.setConfig({ questionCount: v });
+					if (typeof quiz.restartQuiz === "function") quiz.restartQuiz();
+				}
+				closeSettings();
+			});
+
+			// キーボード操作: 矢印で選択、Enter/Spaceで決定
+			// キーボード操作と aria-pressed 管理はモジュール側で行います。
+		</script>
+	</body>
+</html>
