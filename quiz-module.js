@@ -377,9 +377,10 @@ export function createQuiz(options = {}) {
 			return Promise.resolve();
 		// try a few likely relative paths (from quiz.html in Downloads to Desktop)
 		const candidates = [
+			"/words-data-section10.js",
 			"./words-data-section10.js",
 			"../Desktop/words-data-section10.js",
-			"../words-data-section10.js",
+			"../words-data-section10.js"
 		];
 		// try sequentially until one succeeds or all fail
 		let p = Promise.reject();
@@ -713,4 +714,5 @@ export function createQuiz(options = {}) {
 		setConfig: (c) => Object.assign(cfg, c),
 	};
 }
+
 
