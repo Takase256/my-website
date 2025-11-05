@@ -34,7 +34,7 @@ export function createQuiz(options = {}) {
 		questionCount: 5,
 		// enable verbose debugging in the browser console by passing { debug: true } to createQuiz
 		debug: false,
-		formUrl: "",
+		formUrl: "https://docs.google.com/forms/d/e/1FAIpQLSdABdWeTQhzQSSF6kcsSKEaqMtoOMAhA24CB_8N1r15whtz1g/formResponse",
 		entryIds: {},
 		texts: {
 			next: "次の問題",
@@ -714,5 +714,3 @@ export function createQuiz(options = {}) {
 		setConfig: (c) => Object.assign(cfg, c),
 	};
 }
-
-
